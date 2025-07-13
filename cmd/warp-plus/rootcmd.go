@@ -23,24 +23,25 @@ type rootConfig struct {
 	flags   *ff.FlagSet
 	command *ff.Command
 
-	verbose  bool
-	v4       bool
-	v6       bool
-	bind     string
-	endpoint string
-	key      string
-	dns      string
-	gool     bool
-	psiphon  bool
-	country  string
-	scan     bool
-	rtt      time.Duration
-	cacheDir string
-	fwmark   uint32
-	reserved string
-	wgConf   string
-	testUrl  string
-	config   string
+	verbose        bool
+	v4             bool
+	v6             bool
+	bind           string
+	endpoint       string
+	key            string
+	dns            string
+	gool           bool
+	psiphon        bool
+	country        string
+	scan           bool
+	rtt            time.Duration
+	cacheDir       string
+	fwmark         uint32
+	reserved       string
+	wgConf         string
+	testUrl        string
+	connectTimeout time.Duration
+	config         string
 }
 
 func newRootCmd() *rootConfig {
@@ -131,6 +132,10 @@ func newRootCmd() *rootConfig {
 		Value:    ffval.NewValueDefault(&cfg.testUrl, "http://connectivity.cloudflareclient.com/cdn-cgi/trace"),
 	})
 	cfg.flags.AddFlag(ff.FlagConfig{
+		LongName: "connect-timeout",
+		Value:    ffval.NewValueDefault(&cfg.connectTimeout, 15*time.Second),
+	})
+	cfg.flags.AddFlag(ff.FlagConfig{
 		ShortName: 'c',
 		LongName:  "config",
 		Value:     ffval.NewValueDefault(&cfg.config, ""),
@@ -182,6 +187,7 @@ func (c *rootConfig) exec(ctx context.Context, args []string) error {
 		WireguardConfig: c.wgConf,
 		Reserved:        c.reserved,
 		TestURL:         c.testUrl,
+		ConnectTimeout:  c.connectTimeout,
 	}
 
 	switch {

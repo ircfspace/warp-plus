@@ -18,7 +18,7 @@ import (
 )
 
 func usermodeTunTest(ctx context.Context, l *slog.Logger, tnet *netstack.Net, url string) error {
-	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(5*time.Second))
+	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(60*time.Second))
 	defer cancel()
 
 	for {
@@ -91,7 +91,7 @@ func waitHandshake(ctx context.Context, l *slog.Logger, dev *device.Device) erro
 	return nil
 }
 
-func establishWireguard(l *slog.Logger, conf *wiresocks.Configuration, tunDev wgtun.Device, fwmark uint32, t string) error {
+func establishWireguard(l *slog.Logger, conf *wiresocks.Configuration, tunDev wgtun.Device, fwmark uint32, t string, timeout time.Duration) error {
 	// create the IPC message to establish the wireguard conn
 	var request bytes.Buffer
 
@@ -127,7 +127,8 @@ func establishWireguard(l *slog.Logger, conf *wiresocks.Configuration, tunDev wg
 		return err
 	}
 
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(15*time.Second))
+	fmt.Println(timeout)
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(timeout))
 	defer cancel()
 	if err := waitHandshake(ctx, l, dev); err != nil {
 		dev.BindClose()
