@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/netip"
 	"path"
+	"time"
 
 	"github.com/bepass-org/warp-plus/iputils"
 	"github.com/bepass-org/warp-plus/psiphon"
@@ -33,6 +34,7 @@ type WarpOptions struct {
 	WireguardConfig string
 	Reserved        string
 	TestURL         string
+	ConnectTimeout  time.Duration
 }
 
 type PsiphonOptions struct {
@@ -142,7 +144,7 @@ func runWireguard(ctx context.Context, l *slog.Logger, opts WarpOptions) error {
 			continue
 		}
 
-		werr = establishWireguard(l, conf, tunDev, opts.FwMark, t)
+		werr = establishWireguard(l, conf, tunDev, opts.FwMark, t, opts.ConnectTimeout)
 		if werr != nil {
 			continue
 		}
@@ -211,7 +213,7 @@ func runWarp(ctx context.Context, l *slog.Logger, opts WarpOptions, endpoint str
 			continue
 		}
 
-		werr = establishWireguard(l, &conf, tunDev, opts.FwMark, t)
+		werr = establishWireguard(l, &conf, tunDev, opts.FwMark, t, opts.ConnectTimeout)
 		if werr != nil {
 			continue
 		}
@@ -280,7 +282,7 @@ func runWarpInWarp(ctx context.Context, l *slog.Logger, opts WarpOptions, endpoi
 			continue
 		}
 
-		werr = establishWireguard(l.With("gool", "outer"), &conf, tunDev, opts.FwMark, t)
+		werr = establishWireguard(l.With("gool", "outer"), &conf, tunDev, opts.FwMark, t, opts.ConnectTimeout)
 		if werr != nil {
 			continue
 		}
@@ -339,7 +341,7 @@ func runWarpInWarp(ctx context.Context, l *slog.Logger, opts WarpOptions, endpoi
 	}
 
 	// Establish wireguard on userspace stack
-	if err := establishWireguard(l.With("gool", "inner"), &conf, tunDev, opts.FwMark, "t0"); err != nil {
+	if err := establishWireguard(l.With("gool", "inner"), &conf, tunDev, opts.FwMark, "t0", opts.ConnectTimeout); err != nil {
 		return err
 	}
 
@@ -400,7 +402,7 @@ func runWarpWithPsiphon(ctx context.Context, l *slog.Logger, opts WarpOptions, e
 			continue
 		}
 
-		werr = establishWireguard(l, &conf, tunDev, opts.FwMark, t)
+		werr = establishWireguard(l, &conf, tunDev, opts.FwMark, t, opts.ConnectTimeout)
 		if werr != nil {
 			continue
 		}
