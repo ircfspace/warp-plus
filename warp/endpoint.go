@@ -19,6 +19,7 @@ func WarpPrefixes() []netip.Prefix {
 		netip.MustParsePrefix("2606:4700:d0::/64"),
 		netip.MustParsePrefix("2606:4700:d1::/64"),*/
 		netip.MustParsePrefix("192.168.192.0/21"),
+		netip.MustParsePrefix("2606:4700:100::/48"),
 	}
 }
 
